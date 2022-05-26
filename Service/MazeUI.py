@@ -18,19 +18,20 @@ class MazeUI(QWidget):
         self.setWindowTitle('Maze')
         self.setGeometry(50, 50, self.width, self.height)
         self.setFixedSize(self.width, self.height)
+        # self.setLayout(self.layout)
 
         # 建立mazeSizeComboBox Label
         self.mazeSizeComboBoxLabel = QLabel(self)
         self.mazeSizeComboBoxLabel.setText("請選擇地圖大小：")
-        self.mazeSizeComboBoxLabel.resize(200, 100)
-        self.mazeSizeComboBoxLabel.move(810, 100)
+        self.mazeSizeComboBoxLabel.resize(200, 30)
+        self.mazeSizeComboBoxLabel.move(810, 10)
 
         # 建立下拉式選單
         self.mazeSizeComboBox = QComboBox(self)
         self.mazeSizeComboBox.addItems(
             ["{:02d}".format(x) for x in range(2, 21)])
         self.mazeSizeComboBox.resize(200, 30)
-        self.mazeSizeComboBox.move(810, 10)
+        self.mazeSizeComboBox.move(810, 40)
         self.mazeSizeComboBox.setCurrentIndex(18)
         self.mazeSizeComboBox.currentIndexChanged.connect(
             self.change_maze_size)
@@ -38,7 +39,7 @@ class MazeUI(QWidget):
         # 建立刷新按鈕
         self.refreshBtn = QPushButton("刷新", self)
         self.refreshBtn.resize(90, 30)
-        self.refreshBtn.move(1030, 10)
+        self.refreshBtn.move(1030, 40)
         self.refreshBtn.clicked.connect(self.create_maze)
 
         # 預設產生 20 * 20 地圖
@@ -50,32 +51,34 @@ class MazeUI(QWidget):
 
     def create_maze(self):
         self.remove_maze()
+        self.maze = [
+            [None for _ in range(0, self.mazeSize)]
+            for _ in range(0, self.mazeSize)
+        ]
         maze = Maze(self.mazeSize)
-        maze.random()
-        boxSize = int(self.height / self.mazeSize)
-        for iIndex, i in enumerate(maze.random()):
-            for jIndex, j in enumerate(i):
+        for x, i in enumerate(maze.random()):
+            for y, j in enumerate(i):
                 if(j == 1):
-                    self.create_maze_btn(iIndex * boxSize, jIndex *
-                                         boxSize, boxSize, False)
+                    self.create_maze_btn(x, y, "GRASS")
                 else:
-                    self.create_maze_btn(iIndex * boxSize, jIndex *
-                                         boxSize, boxSize, True)
+                    self.create_maze_btn(x, y, "WALL")
 
-    def create_maze_btn(self, x, y, boxSize, is_wall):
-        button = QPushButton('', self)
-        button.resize(boxSize, boxSize)
-        button.move(x, y)
-        if(is_wall):
-            button.setStyleSheet(
-                "border-image: url('./Images/wall.jpg');border: none;border-radius: 0px")
-        else:
-            button.setStyleSheet(
-                "border: none;border-radius: 0px;border-image: url('./Images/ground.jpg');")
-        button.show()
-        self.maze.append(button)
+    def create_maze_btn(self, x, y, type):
+        boxSize = self.height // self.mazeSize
+        self.maze[x][y] = QPushButton('', self)
+        self.maze[x][y].resize(boxSize, boxSize)
+        self.maze[x][y].move(x * boxSize, y * boxSize)
+        style = "border: none;border-radius: 0px;"
+        if(type == "WALL"):
+            style += "border-image: url('./Images/wall.jpg');"
+        elif(type == "GRASS"):
+            style += "border-image: url('./Images/ground.jpg');"
+
+        self.maze[x][y].setStyleSheet(style)
+        self.maze[x][y].show()
 
     def remove_maze(self):
         for i in self.maze:
-            i.deleteLater()
-        self.maze = []
+            for j in i:
+                j.deleteLater()
+        self.maze = None
