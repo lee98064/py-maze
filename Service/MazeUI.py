@@ -21,7 +21,6 @@ class MazeUI(QWidget):
         self.setWindowTitle('Maze')
         self.setGeometry(50, 50, self.width, self.height)
         self.setFixedSize(self.width, self.height)
-        # self.setLayout(self.layout)
 
         # 建立mazeSizeComboBox Label
         self.mazeSizeComboBoxLabel = QLabel(self)

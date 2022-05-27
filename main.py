@@ -10,5 +10,4 @@ if __name__ == '__main__':
     apply_stylesheet(app, theme='light_pink.xml')
     w = MazeUI()
     w.show()
-    # w.remove_maze()
     sys.exit(app.exec_())
