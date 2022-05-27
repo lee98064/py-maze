@@ -44,7 +44,8 @@ class SolveMaze(QtCore.QThread):
                     if(0 <= next[0] < h and 0 <= next[1] < w and self.maze[next[0]][next[1]] != 0 and dist[next[0]][next[1]] == 1e9):
                         dist[next[0]][next[1]] = dist[cur[0]][cur[0]] + 1
                         stack.append([next[0], next[1]])
-
+            if(cur == [h-1, w-1]):
+                break
         self._signal.emit([h-1, w-1])
 
     def BFS(self):
