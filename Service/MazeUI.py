@@ -1,5 +1,6 @@
 import time
 from Service.Maze import Maze
+from Service.SolveMaze import SolveMaze
 from PyQt5.QtWidgets import (
     QWidget, QPushButton, QComboBox, QLabel, QGridLayout)
 
@@ -10,6 +11,7 @@ class MazeUI(QWidget):
         super().__init__()
         self.maze = []
         self.mazeSize = 20
+        self.solveType = "DFS"
         self.width = 1200
         self.height = 800
         self.initUI()
@@ -42,8 +44,31 @@ class MazeUI(QWidget):
         self.refreshBtn.move(1030, 40)
         self.refreshBtn.clicked.connect(self.create_maze)
 
+        # 建立solveMazeComboBox Label
+        self.solveMazeComboBoxLabel = QLabel(self)
+        self.solveMazeComboBoxLabel.setText("請選擇解迷宮方法：")
+        self.solveMazeComboBoxLabel.resize(200, 30)
+        self.solveMazeComboBoxLabel.move(810, 100)
+
+        # 建立解迷宮方法下拉選單
+        self.solveMazeComboBox = QComboBox(self)
+        self.solveMazeComboBox.addItems(["DFS", "BFS"])
+        self.solveMazeComboBox.resize(200, 30)
+        self.solveMazeComboBox.move(810, 130)
+        self.solveMazeComboBox.currentIndexChanged.connect(
+            self.change_solve_type)
+
+        # 建立解迷宮按鈕
+        self.solveMazeBtn = QPushButton("解迷宮", self)
+        self.solveMazeBtn.resize(90, 30)
+        self.solveMazeBtn.move(1030, 130)
+        self.solveMazeBtn.clicked.connect(self.solve_maze)
+
         # 預設產生 20 * 20 地圖
         self.create_maze()
+
+    def change_solve_type(self):
+        self.solveType = self.solveMazeComboBox.currentText()
 
     def change_maze_size(self):
         # print(self.mazeSizeComboBox.currentText())
@@ -82,3 +107,20 @@ class MazeUI(QWidget):
             for j in i:
                 j.deleteLater()
         self.maze = None
+
+    def solve_maze(self):
+        self.refreshBtn.setDisabled(True)
+        self.solveMazeBtn.setDisabled(True)
+        self.thread = SolveMaze(self.maze)
+        self.thread._signal.connect(self.solve_maze_callback)
+        self.thread.finished.connect(self.solve_maze_finished)
+        self.thread.start()
+
+    def solve_maze_callback(self, coordinate):
+        x, y = coordinate
+        style = "border: none;border-radius: 0px;border-image: url('./Images/mouse.png');background-color: green;"
+        self.maze[x][y].setStyleSheet(style)
+
+    def solve_maze_finished(self):
+        self.refreshBtn.setDisabled(False)
+        self.solveMazeBtn.setDisabled(False)
