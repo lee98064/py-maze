@@ -10,6 +10,7 @@ class MazeUI(QWidget):
     def __init__(self):
         super().__init__()
         self.maze = []
+        self.mazeBtn = []
         self.mazeSize = 20
         self.solveType = "DFS"
         self.width = 1200
@@ -76,12 +77,13 @@ class MazeUI(QWidget):
 
     def create_maze(self):
         self.remove_maze()
-        self.maze = [
+        self.mazeBtn = [
             [None for _ in range(0, self.mazeSize)]
             for _ in range(0, self.mazeSize)
         ]
         maze = Maze(self.mazeSize)
-        for x, i in enumerate(maze.random()):
+        self.maze = maze.random()
+        for x, i in enumerate(self.maze):
             for y, j in enumerate(i):
                 if(j == 1):
                     self.create_maze_btn(x, y, "GRASS")
@@ -90,28 +92,29 @@ class MazeUI(QWidget):
 
     def create_maze_btn(self, x, y, type):
         boxSize = self.height // self.mazeSize
-        self.maze[x][y] = QPushButton('', self)
-        self.maze[x][y].resize(boxSize, boxSize)
-        self.maze[x][y].move(x * boxSize, y * boxSize)
+        self.mazeBtn[x][y] = QPushButton('', self)
+        self.mazeBtn[x][y].resize(boxSize, boxSize)
+        self.mazeBtn[x][y].move(x * boxSize, y * boxSize)
         style = "border: none;border-radius: 0px;"
         if(type == "WALL"):
             style += "border-image: url('./Images/wall.jpg');"
         elif(type == "GRASS"):
             style += "border-image: url('./Images/ground.jpg');"
 
-        self.maze[x][y].setStyleSheet(style)
-        self.maze[x][y].show()
+        self.mazeBtn[x][y].setStyleSheet(style)
+        self.mazeBtn[x][y].show()
 
     def remove_maze(self):
-        for i in self.maze:
+        for i in self.mazeBtn:
             for j in i:
                 j.deleteLater()
-        self.maze = None
+        self.mazeBtn = []
+        self.maze = []
 
     def solve_maze(self):
         self.refreshBtn.setDisabled(True)
         self.solveMazeBtn.setDisabled(True)
-        self.thread = SolveMaze(self.maze)
+        self.thread = SolveMaze(self.maze, self.solveType)
         self.thread._signal.connect(self.solve_maze_callback)
         self.thread.finished.connect(self.solve_maze_finished)
         self.thread.start()
@@ -119,7 +122,7 @@ class MazeUI(QWidget):
     def solve_maze_callback(self, coordinate):
         x, y = coordinate
         style = "border: none;border-radius: 0px;border-image: url('./Images/mouse.png');background-color: green;"
-        self.maze[x][y].setStyleSheet(style)
+        self.mazeBtn[x][y].setStyleSheet(style)
 
     def solve_maze_finished(self):
         self.refreshBtn.setDisabled(False)
