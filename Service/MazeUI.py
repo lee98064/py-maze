@@ -13,6 +13,8 @@ class MazeUI(QWidget):
         self.mazeBtn = []
         self.mazeSize = 20
         self.solveType = "DFS"
+        self.last_x = 0
+        self.last_y = 0
         self.width = 1200
         self.height = 800
         self.initUI()
@@ -76,6 +78,7 @@ class MazeUI(QWidget):
 
     def create_maze(self):
         self.remove_maze()
+        self.last_x, self.last_y = 0, 0
         self.mazeBtn = [
             [None for _ in range(0, self.mazeSize)]
             for _ in range(0, self.mazeSize)
@@ -120,8 +123,15 @@ class MazeUI(QWidget):
 
     def solve_maze_callback(self, coordinate):
         x, y = coordinate
-        style = "border: none;border-radius: 0px;border-image: url('./Images/mouse.png');background-color: green;"
-        self.mazeBtn[x][y].setStyleSheet(style)
+        style = "border: none;border-radius: 0px;"
+
+        self.mazeBtn[self.last_x][self.last_y].setStyleSheet(
+            style + "border-image: url('./Images/past.png');")
+
+        self.mazeBtn[x][y].setStyleSheet(
+            style + "border-image: url('./Images/mouse_ground.png');")
+
+        self.last_x, self.last_y = coordinate
 
     def solve_maze_finished(self):
         self.refreshBtn.setDisabled(False)

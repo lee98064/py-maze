@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 pyqt5 = "*"
 qt-material = "*"
+pyinstaller = "*"
 
 [dev-packages]
 autopep8 = "*"

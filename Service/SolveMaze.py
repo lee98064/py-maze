@@ -24,11 +24,6 @@ class SolveMaze(QtCore.QThread):
             self.DFS()
             return
 
-        # for x, i in enumerate(self.maze):
-        #     for y, j in enumerate(self.maze):
-        #         self._signal.emit([x, y])
-        #         time.sleep(0.1)
-
     def DFS(self):
         di = [0, -1, 0, 1]
         dj = [-1, 0, 1, 0]
@@ -43,13 +38,12 @@ class SolveMaze(QtCore.QThread):
                 self._signal.emit([cur[0], cur[1]])
                 if(cur == [h-1, w-1]):
                     break
+                time.sleep(0.1)
                 for i in range(4):
                     next = [cur[0]+di[i], cur[1]+dj[i]]
                     if(0 <= next[0] < h and 0 <= next[1] < w and self.maze[next[0]][next[1]] != 0 and dist[next[0]][next[1]] == 1e9):
                         dist[next[0]][next[1]] = dist[cur[0]][cur[0]] + 1
-
                         stack.append([next[0], next[1]])
-                    time.sleep(0.05)
 
         self._signal.emit([h-1, w-1])
 
@@ -66,12 +60,12 @@ class SolveMaze(QtCore.QThread):
                 cur = stack.pop(0)
                 if(cur == [h-1, w-1]):
                     break
+                time.sleep(0.1)
                 for i in range(4):
                     next = [cur[0]+di[i], cur[1]+dj[i]]
                     if(0 <= next[0] < h and 0 <= next[1] < w and self.maze[next[0]][next[1]] != 0 and dist[next[0]][next[1]] == 1e9):
                         dist[next[0]][next[1]] = dist[cur[0]][cur[0]] + 1
                         self._signal.emit([cur[0], cur[1]])
                         stack.append([next[0], next[1]])
-                    time.sleep(0.001)
 
         self._signal.emit([h-1, w-1])
