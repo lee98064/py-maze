@@ -1,4 +1,3 @@
-import time
 from Service.Maze import Maze
 from Service.SolveMaze import SolveMaze
 from PyQt5.QtWidgets import (
@@ -44,7 +43,7 @@ class MazeUI(QWidget):
         self.refreshBtn = QPushButton("刷新", self)
         self.refreshBtn.resize(90, 30)
         self.refreshBtn.move(1030, 40)
-        self.refreshBtn.clicked.connect(self.create_maze)
+        self.refreshBtn.clicked.connect(self.create_new_maze)
 
         # 建立solveMazeComboBox Label
         self.solveMazeComboBoxLabel = QLabel(self)
@@ -66,8 +65,14 @@ class MazeUI(QWidget):
         self.solveMazeBtn.move(1030, 130)
         self.solveMazeBtn.clicked.connect(self.solve_maze)
 
+        # 建立清空地圖按鈕
+        self.cleanMazeBtn = QPushButton("清空迷宮", self)
+        self.cleanMazeBtn.resize(90, 30)
+        self.cleanMazeBtn.move(1030, 180)
+        self.cleanMazeBtn.clicked.connect(self.clean_maze)
+
         # 預設產生 20 * 20 地圖
-        self.create_maze()
+        self.create_new_maze()
 
     def change_solve_type(self):
         self.solveType = self.solveMazeComboBox.currentText()
@@ -76,29 +81,35 @@ class MazeUI(QWidget):
         # print(self.mazeSizeComboBox.currentText())
         self.mazeSize = int(self.mazeSizeComboBox.currentText())
 
+    def create_new_maze(self):
+        maze = Maze(self.mazeSize)
+        self.maze = maze.random()
+        self.create_maze()
+
     def create_maze(self):
         self.remove_maze()
-        self.last_x, self.last_y = 0, 0
         self.mazeBtn = [
             [None for _ in range(0, self.mazeSize)]
             for _ in range(0, self.mazeSize)
         ]
-        maze = Maze(self.mazeSize)
-        self.maze = maze.random()
         for x, i in enumerate(self.maze):
             for y, j in enumerate(i):
                 if(j == 1):
-                    self.create_maze_btn(x, y, "GRASS")
+                    self.maze_btn(x, y, "GRASS")
                 else:
-                    self.create_maze_btn(x, y, "WALL")
+                    self.maze_btn(x, y, "WALL")
 
-    def create_maze_btn(self, x, y, type):
+    def maze_btn(self, x, y, type):
         boxSize = self.height // self.mazeSize
         self.mazeBtn[x][y] = QPushButton('', self)
         self.mazeBtn[x][y].resize(boxSize, boxSize)
         self.mazeBtn[x][y].move(x * boxSize, y * boxSize)
         style = "border: none;border-radius: 0px;"
-        if(type == "WALL"):
+        if(x == 0 and y == 0):
+            style += "border-image: url('./Images/mouse_ground.png');"
+        elif (x == self.mazeSize - 1 and y == self.mazeSize - 1):
+            style += "border-image: url('./Images/end.png');"
+        elif(type == "WALL"):
             style += "border-image: url('./Images/wall.jpg');"
         elif(type == "GRASS"):
             style += "border-image: url('./Images/ground.jpg');"
@@ -111,18 +122,24 @@ class MazeUI(QWidget):
             for j in i:
                 j.deleteLater()
         self.mazeBtn = []
-        self.maze = []
+
+    def clean_maze(self):
+        self.remove_maze()
+        self.create_maze()
 
     def solve_maze(self):
+        self.last_x, self.last_y = 0, 0
         self.refreshBtn.setDisabled(True)
         self.solveMazeBtn.setDisabled(True)
+        self.cleanMazeBtn.setDisabled(True)
         self.thread = SolveMaze(self.maze, self.solveType)
         self.thread._signal.connect(self.solve_maze_callback)
         self.thread.finished.connect(self.solve_maze_finished)
         self.thread.start()
 
     def solve_maze_callback(self, coordinate):
-        x, y = coordinate
+        x, y, isEnd, route = coordinate
+
         style = "border: none;border-radius: 0px;"
 
         self.mazeBtn[self.last_x][self.last_y].setStyleSheet(
@@ -131,8 +148,14 @@ class MazeUI(QWidget):
         self.mazeBtn[x][y].setStyleSheet(
             style + "border-image: url('./Images/mouse_ground.png');")
 
-        self.last_x, self.last_y = coordinate
+        self.last_x, self.last_y = x, y
+
+        if(isEnd):
+            for rx, ry in route:
+                self.mazeBtn[rx][ry].setStyleSheet(
+                    style + "border-image: url('./Images/route.png');")
 
     def solve_maze_finished(self):
         self.refreshBtn.setDisabled(False)
         self.solveMazeBtn.setDisabled(False)
+        self.cleanMazeBtn.setDisabled(False)
