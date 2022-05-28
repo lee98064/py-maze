@@ -16,6 +16,7 @@ class MazeUI(QWidget):
         self.last_y = 0
         self.width = 1200
         self.height = 800
+        self.thread = None
         self.initUI()
 
     def initUI(self):
@@ -159,3 +160,4 @@ class MazeUI(QWidget):
         self.refreshBtn.setDisabled(False)
         self.solveMazeBtn.setDisabled(False)
         self.cleanMazeBtn.setDisabled(False)
+        self.thread = None
