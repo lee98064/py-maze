@@ -33,7 +33,7 @@ class MazeUI(QWidget):
         # 建立下拉式選單
         self.mazeSizeComboBox = QComboBox(self)
         self.mazeSizeComboBox.addItems(
-            ["{:02d}".format(x) for x in range(2, 21)])
+            ["{:02d}".format(x) for x in range(2, 41)])
         self.mazeSizeComboBox.resize(200, 30)
         self.mazeSizeComboBox.move(810, 40)
         self.mazeSizeComboBox.setCurrentIndex(18)
