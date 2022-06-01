@@ -10,7 +10,7 @@ class MazeUI(QWidget):
         super().__init__()
         self.maze = []
         self.mazeBtn = []
-        self.mazeSize = 20
+        self.mazeSize = 7
         self.solveType = "DFS"
         self.last_x = 0
         self.last_y = 0
@@ -84,7 +84,7 @@ class MazeUI(QWidget):
 
     def create_new_maze(self):
         maze = Maze(self.mazeSize)
-        self.maze = maze.random()
+        self.maze = maze.get_maze()
         self.create_maze()
 
     def create_maze(self):
@@ -95,10 +95,7 @@ class MazeUI(QWidget):
         ]
         for x, i in enumerate(self.maze):
             for y, j in enumerate(i):
-                if(j == 1):
-                    self.maze_btn(x, y, "GRASS")
-                else:
-                    self.maze_btn(x, y, "WALL")
+                self.maze_btn(y, x, j)
 
     def maze_btn(self, x, y, type):
         boxSize = self.height // self.mazeSize
@@ -106,17 +103,18 @@ class MazeUI(QWidget):
         self.mazeBtn[x][y].resize(boxSize, boxSize)
         self.mazeBtn[x][y].move(x * boxSize, y * boxSize)
         style = "border: none;border-radius: 0px;"
-        if(x == 0 and y == 0):
-            style += "border-image: url('./Images/mouse_ground.png');"
-        elif (x == self.mazeSize - 1 and y == self.mazeSize - 1):
-            style += "border-image: url('./Images/end.png');"
-        elif(type == "WALL"):
-            style += "border-image: url('./Images/wall.jpg');"
-        elif(type == "GRASS"):
-            style += "border-image: url('./Images/ground.jpg');"
+        style += self.maze_btn_img(type)
 
         self.mazeBtn[x][y].setStyleSheet(style)
         self.mazeBtn[x][y].show()
+
+    def maze_btn_img(self, type):
+        return {
+            '': "border-image: url('./Images/blank.jpg');",
+            't': "border-image: url('./Images/t.jpg');",
+            'r': "border-image: url('./Images/r.jpg');",
+            'tr': "border-image: url('./Images/tr.jpg');",
+        }[type]
 
     def remove_maze(self):
         for i in self.mazeBtn:
