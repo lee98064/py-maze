@@ -10,7 +10,7 @@ class MazeUI(QWidget):
         super().__init__()
         self.maze = []
         self.mazeBtn = []
-        self.mazeSize = 7
+        self.mazeSize = 20
         self.solveType = "DFS"
         self.last_x = 0
         self.last_y = 0
@@ -96,6 +96,8 @@ class MazeUI(QWidget):
         for x, i in enumerate(self.maze):
             for y, j in enumerate(i):
                 self.maze_btn(y, x, j)
+        # for i in self.maze:
+        #     print(i)
 
     def maze_btn(self, x, y, type):
         boxSize = self.height // self.mazeSize
@@ -109,12 +111,18 @@ class MazeUI(QWidget):
         self.mazeBtn[x][y].show()
 
     def maze_btn_img(self, type):
-        return {
-            '': "border-image: url('./Images/blank.jpg');",
-            't': "border-image: url('./Images/t.jpg');",
-            'r': "border-image: url('./Images/r.jpg');",
-            'tr': "border-image: url('./Images/tr.jpg');",
-        }[type]
+        if (type == ''):
+            return "border-image: url('./Images/blank.jpg');"
+
+        return f"border-image: url('./Images/{type}.jpg');"
+        # return {
+        #     '': "border-image: url('./Images/blank.jpg');",
+        #     't': "border-image: url('./Images/t.jpg');",
+        #     'r': "border-image: url('./Images/r.jpg');",
+        #     'tr': "border-image: url('./Images/tr.jpg');",
+        #     'ltr': "border-image: url('./Images/ltr.jpg');",
+        #     'ltr': "border-image: url('./Images/ltr.jpg');",
+        # }[type]
 
     def remove_maze(self):
         for i in self.mazeBtn:

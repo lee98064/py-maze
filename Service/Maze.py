@@ -16,8 +16,16 @@ class Maze():
         a = []
         b = []
         for i in range(0, self.size):
-            m = ["tr" for j in range(0, self.size)]
-            a.append(m)
+            m = []
+            if i == self.size-1:
+                m = ["btr" for j in range(0, self.size)]
+                a.append(m)
+                a[i][0] = "lbtr"
+            else:
+                m = ["tr" for j in range(0, self.size)]
+                a.append(m)
+
+                a[i][0] = "ltr"
             n = [0 for j in range(0, self.size)]
             b.append(n)
         b[0][0] = 1
